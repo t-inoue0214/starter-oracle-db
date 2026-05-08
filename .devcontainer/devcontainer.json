@@ -20,7 +20,7 @@
     },
     "containerEnv": {
         "ORACLE_BASE": "/opt/oracle",
-        "ORACLE_HOME": "/opt/oracle/product/23ai/dbhomeFree",
+        "ORACLE_HOME": "/opt/oracle/product/21c/dbhomeFree",
         "ORACLE_SID": "FREE"
     },
     "postCreateCommand": "mkdir -p ~/scripts ~/data ~/logs",
