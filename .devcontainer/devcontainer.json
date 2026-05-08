@@ -1,0 +1,38 @@
+{
+    "name": "Oracle Database Learning Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "hostRequirements": {
+        "memory": "8gb",
+        "cpus": 4
+    },
+    "forwardPorts": [1521, 5500],
+    "portsAttributes": {
+        "1521": {
+            "label": "Oracle Listener (TNS)",
+            "onAutoForward": "silent"
+        },
+        "5500": {
+            "label": "EM Express",
+            "onAutoForward": "notify"
+        }
+    },
+    "containerEnv": {
+        "ORACLE_BASE": "/opt/oracle",
+        "ORACLE_HOME": "/opt/oracle/product/23ai/dbhomeFree",
+        "ORACLE_SID": "FREE"
+    },
+    "postCreateCommand": "mkdir -p ~/scripts ~/data ~/logs",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "oracle.sql-developer",
+                "ms-azuretools.vscode-docker",
+                "vscjava.vscode-java-pack",
+                "redhat.vscode-yaml"
+            ]
+        }
+    },
+    "remoteUser": "oracle"
+}
