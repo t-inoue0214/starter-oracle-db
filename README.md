@@ -6,7 +6,7 @@ Oracle DB が学習できる環境を提供するため作成しました。
 このリポジトリは、**GitHub Codespaces** を使って、Java 開発経験のある新卒エンジニアが Oracle Database の DBA 基礎を実体験を通じて学べるように作っています。
 
 > **⚠️ 学習上の重要ルール**
-> [Oracle Database 23ai ドキュメント](https://docs.oracle.com/en/database/oracle/oracle-database/23/index.html) の情報が「最新かつ正確」な一次情報です。
+> [Oracle Database 21c ドキュメント](https://docs.oracle.com/en/database/oracle/oracle-database/21/index.html) の情報が「最新かつ正確」な一次情報です。
 > ここで記載した内容や、もし AI から回答を得た場合であっても、**必ず公式ドキュメントを確認しながら学習する癖** をつけてください。
 
 ---
@@ -56,7 +56,7 @@ Oracle DB が学習できる環境を提供するため作成しました。
 
 > **💡 Oracle Database のインストールについて**  
 > Codespace 起動直後は OS（Oracle Linux 8）のみ起動した状態です。  
-> Oracle Database 23ai Free のインストールは、Module 1 の実習として自分の手で行います。これが最初の学習ステップです。
+> Oracle Database 21c XE のインストールは、Module 1 の実習として自分の手で行います。これが最初の学習ステップです。
 
 ### Codespaces利用上の注意
 
@@ -104,7 +104,7 @@ Oracle DB が学習できる環境を提供するため作成しました。
 この講座は以下の環境で動作するように設定されています（自動構築されます）。
 
 - **OS:** Oracle Linux 8
-- **データベース:** Oracle Database 23ai Free (SID: FREE)
+- **データベース:** Oracle Database 21c XE (SID: XE)
 - **ツール:** SQL\*Plus, lsnrctl, adrci, PFILE/SPFILE
 - **エディタ:** VS Code (Codespaces) 上に Oracle SQL Developer / YAML 用の拡張機能を事前インストール済み
 

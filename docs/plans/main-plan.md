@@ -8,7 +8,7 @@
 
 ## 2. 学習環境
 - **プラットフォーム**: GitHub Codespaces (Oracle Linux 8)
-- **DBエディション**: Oracle Database Free 23ai
+- **DBエディション**: Oracle Database 21c XE
 - **ツール**: `SQL*Plus`, `lsnrctl`, `adrci`, 各種初期化パラメータファイル(PFILE/SPFILE)
 
 ## ■ 学習カリキュラム（全7モジュール）
@@ -16,7 +16,7 @@
 ### Module 1: データベースの心臓部を知る（第1章・第2章）
 - **対象**: アーキテクチャ、インストール、DBCA
 - **ポイント**: Codespacesに手動でインストールを行い、バックグラウンドプロセスやメモリ構造(SGA/PGA)がOS上でどう見えているかを確認する。
-- **実習**: `dnf install` から `oracle-free-23ai configure` までの全工程。
+- **実習**: `dnf install` から `oracle-xe-21c configure` までの全工程。
 
 ### Module 2: インスタンスと接続の制御（第3章・第4章）
 - **対象**: 起動・停止、初期化パラメータ、Oracle Net(リスナー)

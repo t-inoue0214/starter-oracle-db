@@ -3,7 +3,7 @@
 ## プロジェクト概要
 
 Oracle Database Silver（Bronze + Silver）の資格取得と DBA としての実践スキル習得を目的とした
-学習環境です。GitHub Codespaces 上で Oracle Linux 8 + Oracle Database 23ai Free を使い、
+学習環境です。GitHub Codespaces 上で Oracle Linux 8 + Oracle Database 21c XE を使い、
 全23章・7モジュールを実機演習で学びます。
 
 **カリキュラム詳細**: `{プロジェクトフォルダ}/docs/plans/main-plan.md` を参照してください。
@@ -16,10 +16,10 @@ Oracle Database Silver（Bronze + Silver）の資格取得と DBA としての�
 |---|---|
 | プラットフォーム | GitHub Codespaces |
 | OS | Oracle Linux 8 |
-| DB | Oracle Database 23ai Free (SID: FREE) |
+| DB | Oracle Database 21c XE (SID: XE) |
 | リモートユーザー | oracle (uid: 54321) |
 | ORACLE_BASE | /opt/oracle |
-| ORACLE_HOME | /opt/oracle/product/23ai/dbhomeFree |
+| ORACLE_HOME | /opt/oracle/product/21c/dbhomeXE |
 | リスナーポート | 1521 |
 | EM Express | 5500 |
 | 作業ディレクトリ | ~/scripts, ~/data, ~/logs |

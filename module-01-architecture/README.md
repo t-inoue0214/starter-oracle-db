@@ -11,7 +11,7 @@ Oracle Database は、単なる「データを保存する箱」ではありま�
 - Oracle Database の「インスタンス」と「データベース」の違いを説明できる
 - SGA（System Global Area）に含まれる主要なメモリ領域の役割を説明できる
 - 主要なバックグラウンドプロセス（DBWn, LGWR, CKPT, SMON, PMON）の役割を説明できる
-- Oracle Database 23ai Free を `dnf` コマンドでインストールし、起動確認できる
+- Oracle Database 21c XE を `dnf` コマンドでインストールし、起動確認できる
 - DBCA の役割と使用場面を説明できる
 - SQL\*Plus でインスタンスに接続し、基本的な情報を取得できる
 
@@ -106,10 +106,10 @@ Oracle が起動すると自動で起動するプロセス群です。
 
 ## 第2章: インストールと DBCA
 
-### oracle-database-preinstall-23ai の役割
+### oracle-database-preinstall-21c の役割
 
 Oracle Database のインストールには、OS レベルの事前設定が多数必要です。
-`oracle-database-preinstall-23ai` パッケージはこれらを自動化します。
+`oracle-database-preinstall-21c` パッケージはこれらを自動化します。
 
 自動設定される主な内容:
 - カーネルパラメータ（`shmmax`, `semaphore` など）の最適化
@@ -118,15 +118,15 @@ Oracle Database のインストールには、OS レベルの事前設定が多�
 
 ---
 
-### oracle-database-free-23ai のインストール構成
+### oracle-database-xe-21c のインストール構成
 
 インストール後の主要なパス:
 
 | パス | 内容 |
 | :--- | :--- |
 | `ORACLE_BASE` = `/opt/oracle` | Oracle ソフトウェア全体のベースディレクトリ |
-| `ORACLE_HOME` = `/opt/oracle/product/23ai/dbhomeFree` | データベースバイナリ（sqlplus, lsnrctl など）の格納先 |
-| `ORACLE_SID` = `FREE` | このコンテナで動作するデータベースの識別子 |
+| `ORACLE_HOME` = `/opt/oracle/product/21c/dbhomeXE` | データベースバイナリ（sqlplus, lsnrctl など）の格納先 |
+| `ORACLE_SID` = `XE` | このコンテナで動作するデータベースの識別子 |
 
 ---
 
@@ -140,14 +140,14 @@ DBCA は Oracle が提供する GUI/CUI ツールで、データベースの作�
 | 表領域・ファイル作成 | CREATE TABLESPACE 文を手動実行 | 自動生成 |
 | ミス防止 | 自己責任 | バリデーションあり |
 
-Oracle Database 23ai Free では、`configure` コマンド実行時に DBCA が内部的に呼び出され、
-初期データベース（SID: FREE）が自動作成されます。
+Oracle Database 21c XE では、`configure` コマンド実行時に DBCA が内部的に呼び出され、
+初期データベース（SID: XE）が自動作成されます。
 
 ---
 
 ## ハンズオン手順
 
-> **前提**: このコンテナの Dockerfile で `oracle-database-preinstall-23ai` はすでにインストール済みです。
+> **前提**: このコンテナの Dockerfile で `oracle-database-preinstall-21c` はすでにインストール済みです。
 > ここでは Oracle Database 本体のインストールから行います。
 
 ### Step 1: Oracle リポジトリの確認
@@ -163,25 +163,25 @@ ol8_baseos_latest   Oracle Linux 8 BaseOS Latest (x86_64)
 ol8_appstream       Oracle Linux 8 Application Stream (x86_64)
 ```
 
-### Step 2: Oracle Database 23ai Free のインストール
+### Step 2: Oracle Database 21c XE のインストール
 
 ```bash
 # インストール（数分かかります）
-sudo dnf install -y oracle-database-free-23ai
+sudo dnf install -y oracle-database-xe-21c
 ```
 
-インストール完了後、`/opt/oracle/product/23ai/dbhomeFree/` に
+インストール完了後、`/opt/oracle/product/21c/dbhomeXE/` に
 バイナリが展開されていることを確認します。
 
 ```bash
-ls /opt/oracle/product/23ai/dbhomeFree/bin/sqlplus
+ls /opt/oracle/product/21c/dbhomeXE/bin/sqlplus
 ```
 
 ### Step 3: データベースの設定・初期化
 
 ```bash
-# 初期データベース（SID: FREE）を作成・設定する
-sudo /etc/init.d/oracle-free-23ai configure
+# 初期データベース（SID: XE）を作成・設定する
+sudo /etc/init.d/oracle-xe-21c configure
 ```
 
 > プロンプトでパスワードの入力を求められます。SYS / SYSTEM ユーザーのパスワードを設定してください。  
@@ -253,11 +253,11 @@ ps aux | grep -E 'ora_' | grep -v grep
 
 期待される出力例（一部）:
 ```
-oracle   1234  ... ora_dbw0_FREE
-oracle   1235  ... ora_lgwr_FREE
-oracle   1236  ... ora_ckpt_FREE
-oracle   1237  ... ora_smon_FREE
-oracle   1238  ... ora_pmon_FREE
+oracle   1234  ... ora_dbw0_XE
+oracle   1235  ... ora_lgwr_XE
+oracle   1236  ... ora_ckpt_XE
+oracle   1237  ... ora_smon_XE
+oracle   1238  ... ora_pmon_XE
 ```
 
 ### Step 7: SGA 情報の確認
@@ -289,7 +289,7 @@ Buffer Cache Size                  480.0
 1. Oracle の「インスタンス」と「データベース」は何が違いますか？それぞれ OS 上でどのように存在していますか？
 2. SGA に含まれる主要なメモリ領域を3つ挙げ、それぞれがどのような役割を担っているか説明してください。
 3. LGWR（Log Writer）はどのタイミングで動作しますか？また、なぜコミット時に必ず書き込みが行われるのでしょうか？
-4. `oracle-database-preinstall-23ai` パッケージをインストールする目的は何ですか？これがないと何が起きると考えられますか？
+4. `oracle-database-preinstall-21c` パッケージをインストールする目的は何ですか？これがないと何が起きると考えられますか？
 5. DBCA を使わずに手動でデータベースを作成することは可能ですか？DBCA を使う利点は何でしょうか？
 
 ---
