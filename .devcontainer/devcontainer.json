@@ -21,16 +21,19 @@
     "containerEnv": {
         "ORACLE_BASE": "/opt/oracle",
         "ORACLE_HOME": "/opt/oracle/product/21c/dbhomeXE",
-        "ORACLE_SID": "XE"
+        "ORACLE_SID": "XE",
+        "ORACLE_HOSTNAME": "$(hostname)"
     },
-    "postCreateCommand": "mkdir -p ~/scripts ~/data ~/logs",
+    "postCreateCommand": "echo \"127.0.0.1 $(hostname)\" | sudo tee -a /etc/hosts && mkdir -p ~/scripts ~/data ~/logs",
     "customizations": {
         "vscode": {
             "extensions": [
                 "oracle.sql-developer",
                 "ms-azuretools.vscode-docker",
                 "vscjava.vscode-java-pack",
-                "redhat.vscode-yaml"
+                "redhat.vscode-yaml",
+                "anthropic.claude-code",
+                "mermaidchart.vscode-mermaid-chart"
             ]
         }
     },

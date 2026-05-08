@@ -150,24 +150,56 @@ Oracle Database 21c XE では、`configure` コマンド実行時に DBCA が内
 > **前提**: このコンテナの Dockerfile で `oracle-database-preinstall-21c` はすでにインストール済みです。
 > ここでは Oracle Database 本体のインストールから行います。
 
-### Step 1: Oracle リポジトリの確認
+---
+
+### 事前準備: Oracle Database 21c XE RPM のダウンロード
+
+#### なぜ手動ダウンロードが必要か
+
+`oracle-database-free-23ai`（23ai 版）は Oracle Linux の標準 dnf リポジトリから `dnf install` 一発で入りますが、
+`oracle-database-xe-21c` は通常の dnf リポジトリには含まれていません。
+
+また、Oracle Database XE は**無償で使用できますが、オープンソースではありません**。
+Oracle の利用規約（Oracle Free Use Terms and Conditions）により **再配布（redistribution）が明示的に禁止**されているため、
+RPM ファイルを GitHub などの公開リポジトリに置くことはライセンス違反になります。
+このため、各自が oracle.com から直接ダウンロードする必要があります。
+
+> この制約を知っておくことは、将来 Oracle Database を本番環境で運用する DBA として重要な知識です。
+
+#### ダウンロード手順
+
+1. **ブラウザで** Oracle の XE ダウンロードページを開く
+   - URL: `https://www.oracle.com/database/technologies/xe-downloads.html`
+2. Oracle アカウントでサインイン（無料、未登録なら作成）
+3. **Oracle Database 21c Express Edition for Linux x86-64** の RPM をダウンロード
+   - ファイル名: `oracle-database-xe-21c-21.0.0-0.0.el8.x86_64.rpm`（約 1.7 GB）
+4. ダウンロードした RPM を Codespace にアップロードする
+   - VS Code の左側 Explorer パネルでプロジェクトルート（`/workspaces/starter-oracle-db/`）を右クリック →「Upload...」を選択
+   - ダウンロードした RPM ファイルを選んでアップロード
+   - `.gitignore` に `*.rpm` を登録済みのため、誤ってコミットされる心配はありません
+
+---
+
+### Step 1: RPM ファイルの配置確認
 
 ```bash
-# oracle リポジトリが有効になっているか確認
-sudo dnf repolist | grep oracle
+# アップロードした RPM がプロジェクトルートにあることを確認
+ls /workspaces/starter-oracle-db/oracle-database-xe-21c-*.rpm
 ```
 
-期待される出力例:
+期待される出力:
 ```
-ol8_baseos_latest   Oracle Linux 8 BaseOS Latest (x86_64)
-ol8_appstream       Oracle Linux 8 Application Stream (x86_64)
+/workspaces/starter-oracle-db/oracle-database-xe-21c-21.0.0-0.0.el8.x86_64.rpm
 ```
+
+ファイルが見当たらない場合は、事前準備の手順に戻ってアップロードしてください。
 
 ### Step 2: Oracle Database 21c XE のインストール
 
 ```bash
-# インストール（数分かかります）
-sudo dnf install -y oracle-database-xe-21c
+# ローカル RPM からインストール（数分かかります）
+# ORACLE_DOCKER_INSTALL=true はコンテナ環境での su エラーを回避するために必要
+sudo ORACLE_DOCKER_INSTALL=true dnf localinstall -y /workspaces/starter-oracle-db/oracle-database-xe-21c-*.rpm
 ```
 
 インストール完了後、`/opt/oracle/product/21c/dbhomeXE/` に
@@ -177,14 +209,64 @@ sudo dnf install -y oracle-database-xe-21c
 ls /opt/oracle/product/21c/dbhomeXE/bin/sqlplus
 ```
 
-### Step 3: データベースの設定・初期化
+### Step 3: 環境変数の設定
+
+Oracle のバイナリ（`sqlplus`, `lsnrctl` など）を PATH に通すため、環境変数ファイルを作成します。
+
+**なぜ2か所に設定するのか**
+
+| ファイル | 対象 | 目的 |
+| :--- | :--- | :--- |
+| `/etc/profile.d/oracle-env.sh` | システム全体のすべてのユーザー | 新しいシェルを開いたとき自動で読み込まれる |
+| `~/.bash_profile` | oracle ユーザーのみ | ログインシェル起動時に読み込まれる |
+
+`setup-env.sh` を実行すると、上記2ファイルの作成と現在のシェルへの反映を一括で行います:
+
+```bash
+bash /workspaces/starter-oracle-db/module-01-architecture/setup-env.sh
+```
+
+期待される出力:
+```
+=== /etc/profile.d/oracle-env.sh を作成（システム全体向け） ===
+作成完了: /etc/profile.d/oracle-env.sh
+
+=== ~/.bash_profile に追記（oracle ユーザーのログインシェル向け） ===
+追記完了: ~/.bash_profile
+
+=== 現在のシェルに環境変数を反映 ===
+ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
+ORACLE_SID=XE
+
+=== sqlplus の確認 ===
+/opt/oracle/product/21c/dbhomeXE/bin/sqlplus
+環境変数の設定が完了しました。
+```
+
+> **注意**: `bash` で実行するとサブシェルが起動するため、スクリプト内の環境変数の反映は**今開いているターミナルには届きません**。
+> 以下のコマンドで現在のシェルに手動で読み込みます。
+
+```bash
+source ~/.bash_profile
+```
+
+確認:
+```bash
+echo $ORACLE_HOME
+# /opt/oracle/product/21c/dbhomeXE と表示されれば成功
+```
+
+### Step 4: データベースの設定・初期化
 
 ```bash
 # 初期データベース（SID: XE）を作成・設定する
-sudo /etc/init.d/oracle-xe-21c configure
+# ORACLE_HOSTNAME=localhost はコンテナ環境でのホスト名解決エラーを回避するために必要
+sudo ORACLE_HOSTNAME=$HOSTNAME /etc/init.d/oracle-xe-21c configure
 ```
 
-> プロンプトでパスワードの入力を求められます。SYS / SYSTEM ユーザーのパスワードを設定してください。  
+> プロンプトでパスワードの入力を求められます。  
+> Oracleでは、入力するパスワードは8文字以上で、大文字1文字、小文字1文字、および数字[0-9]を1つ以上含むことを推奨しています。  
+> なお、このパスワードはSYS、SYSTEM、およびPDBADMINアカウントで共通して使用されます。  
 > このパスワードは以降の SQL\*Plus 接続に使用するので忘れずに記録しておいてください。
 
 設定には数分かかります。完了後に以下が表示されれば成功です:
@@ -192,12 +274,9 @@ sudo /etc/init.d/oracle-xe-21c configure
 Database configuration completed successfully.
 ```
 
-### Step 4: リスナーの起動確認
+### Step 5: リスナーの起動確認
 
 ```bash
-# 環境変数を読み込む
-source /etc/profile.d/oracle-env.sh
-
 # リスナーの状態を確認
 lsnrctl status
 ```
@@ -212,7 +291,7 @@ Start Date                ...
 Uptime                    ...
 ```
 
-### Step 5: SQL\*Plus で接続確認
+### Step 6: SQL\*Plus で接続確認
 
 ```bash
 # OS 認証（パスワード不要）で SYSDBA として接続
@@ -236,31 +315,33 @@ SQL\*Plus を終了します:
 EXIT
 ```
 
-### Step 6: バックグラウンドプロセスの確認
+### Step 7: バックグラウンドプロセスの確認
 
 別のスクリプトを使って、OS 上で動作している Oracle プロセスを確認します:
 
 ```bash
 # check-processes.sh を実行
-bash ~/module-01-architecture/check-processes.sh
+bash /workspaces/starter-oracle-db/module-01-architecture/check-processes.sh
 ```
 
 または直接 `ps` コマンドで確認:
 
 ```bash
-ps aux | grep -E 'ora_' | grep -v grep
+ps aux | grep -E 'xe_' | grep -v grep
 ```
+
+> **補足**: Oracle Database XE では、バックグラウンドプロセスのプレフィックスは `ora_` ではなく `xe_` になります。
 
 期待される出力例（一部）:
 ```
-oracle   1234  ... ora_dbw0_XE
-oracle   1235  ... ora_lgwr_XE
-oracle   1236  ... ora_ckpt_XE
-oracle   1237  ... ora_smon_XE
-oracle   1238  ... ora_pmon_XE
+oracle   ...  xe_pmon_XE
+oracle   ...  xe_dbw0_XE
+oracle   ...  xe_lgwr_XE
+oracle   ...  xe_ckpt_XE
+oracle   ...  xe_smon_XE
 ```
 
-### Step 7: SGA 情報の確認
+### Step 8: SGA 情報の確認
 
 ```bash
 sqlplus -s / as sysdba <<'EOF'
