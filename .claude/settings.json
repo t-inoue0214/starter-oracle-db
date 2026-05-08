@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(markdownlint-cli2 *)",
+      "Bash(textlint *)",
+      "Bash(ls *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read -r f; [[ \"$f\" == *.md ]] && { markdownlint-cli2 \"$f\"; textlint \"$f\"; } || true; }"
+          }
+        ]
+      }
+    ]
+  }
+}

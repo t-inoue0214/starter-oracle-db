@@ -21,10 +21,9 @@
     "containerEnv": {
         "ORACLE_BASE": "/opt/oracle",
         "ORACLE_HOME": "/opt/oracle/product/21c/dbhomeXE",
-        "ORACLE_SID": "XE",
-        "ORACLE_HOSTNAME": "$(hostname)"
+        "ORACLE_SID": "XE"
     },
-    "postCreateCommand": "echo \"127.0.0.1 $(hostname)\" | sudo tee -a /etc/hosts && mkdir -p ~/scripts ~/data ~/logs",
+    "postCreateCommand": "echo \"$(hostname -I | awk '{print $1}') $(hostname)\" | sudo tee -a /etc/hosts && mkdir -p ~/scripts ~/data ~/logs",
     "customizations": {
         "vscode": {
             "extensions": [

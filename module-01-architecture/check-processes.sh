@@ -2,7 +2,7 @@
 # バックグラウンドプロセスと SGA 情報を確認するスクリプト
 
 echo "=== Oracle バックグラウンドプロセス ==="
-ps aux | grep -E 'ora_' | grep -v grep
+ps aux | grep -E 'xe_' | grep -v grep
 
 echo ""
 echo "=== SGA 情報 ==="

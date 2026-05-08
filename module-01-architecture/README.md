@@ -189,7 +189,7 @@ ls /workspaces/starter-oracle-db/oracle-database-xe-21c-*.rpm
 
 期待される出力:
 ```
-/workspaces/starter-oracle-db/oracle-database-xe-21c-21.0.0-0.0.el8.x86_64.rpm
+/workspaces/starter-oracle-db/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm
 ```
 
 ファイルが見当たらない場合は、事前準備の手順に戻ってアップロードしてください。
@@ -260,7 +260,7 @@ echo $ORACLE_HOME
 
 ```bash
 # 初期データベース（SID: XE）を作成・設定する
-# ORACLE_HOSTNAME=localhost はコンテナ環境でのホスト名解決エラーを回避するために必要
+# ORACLE_HOSTNAME=$HOSTNAME はコンテナ環境でのホスト名解決エラーを回避するために必要
 sudo ORACLE_HOSTNAME=$HOSTNAME /etc/init.d/oracle-xe-21c configure
 ```
 
@@ -271,7 +271,7 @@ sudo ORACLE_HOSTNAME=$HOSTNAME /etc/init.d/oracle-xe-21c configure
 
 設定には数分かかります。完了後に以下が表示されれば成功です:
 ```
-Database configuration completed successfully.
+Database creation complete.
 ```
 
 ### Step 5: リスナーの起動確認
