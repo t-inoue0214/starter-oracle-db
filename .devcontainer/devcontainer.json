@@ -7,10 +7,14 @@
         "memory": "8gb",
         "cpus": 4
     },
-    "forwardPorts": [1521, 5501],
+    "forwardPorts": [1521, 2484, 5501],
     "portsAttributes": {
         "1521": {
             "label": "Oracle Listener (TNS)",
+            "onAutoForward": "silent"
+        },
+        "2484": {
+            "label": "Oracle Listener (TCPS/Wallet)",
             "onAutoForward": "silent"
         },
         "5501": {
