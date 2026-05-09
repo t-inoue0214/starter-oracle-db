@@ -101,6 +101,16 @@ PROMPT
 PROMPT === Step 7-6: シーケンス（SEQUENCE） ===
 PROMPT
 
+-- 既存のシーケンスと挿入済み行を削除する（再実行時の冪等性確保）
+BEGIN
+  EXECUTE IMMEDIATE 'DROP SEQUENCE seq_order_id';
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END;
+/
+DELETE FROM orders WHERE order_id >= 2001;
+COMMIT;
+
 -- シーケンスを作成する（2001 からスタート、1 ずつ増加、キャッシュなし）
 CREATE SEQUENCE seq_order_id
   START WITH 2001

@@ -10,6 +10,7 @@ export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
 export PATH=$ORACLE_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export NLS_LANG=JAPANESE_JAPAN.AL32UTF8
 EOF
 sudo chmod +x /etc/profile.d/oracle-env.sh
 echo "作成完了: /etc/profile.d/oracle-env.sh"
@@ -24,6 +25,7 @@ export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
 export PATH=$ORACLE_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export NLS_LANG=JAPANESE_JAPAN.AL32UTF8
 EOF
 echo "追記完了: ~/.bash_profile"
 
@@ -37,6 +39,7 @@ export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 export ORACLE_SID=XE
 export PATH=$ORACLE_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export NLS_LANG=JAPANESE_JAPAN.AL32UTF8
 EOF
 echo "追記完了: ~/.bashrc"
 

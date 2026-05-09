@@ -80,6 +80,7 @@ else
         echo "ERROR: $CONF が見つかりません。" >&2
         exit 1
     fi
+    mkdir -p /tmp/nginx-logs
     sudo nginx -c "$CONF" -g "pid /tmp/nginx-em.pid;"
     sleep 1
     if ss -tlnp | grep -q "0.0.0.0:5501"; then

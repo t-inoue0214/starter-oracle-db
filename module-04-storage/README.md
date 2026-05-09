@@ -317,10 +317,10 @@ WHERE tablespace_name = 'APP_OMF';
 ```sql
 SELECT
   t.tablespace_name,
-  ROUND(SUM(d.bytes)/1024/1024, 1)           total_mb,
-  ROUND(SUM(NVL(f.free_bytes,0))/1024/1024, 1) free_mb,
-  ROUND((1 - SUM(NVL(f.free_bytes,0))
-              / SUM(d.bytes)) * 100, 1)       used_pct
+  ROUND(SUM(d.bytes)/1024/1024, 1)                    total_mb,
+  ROUND(MAX(NVL(f.free_bytes,0))/1024/1024, 1)        free_mb,
+  ROUND((1 - MAX(NVL(f.free_bytes,0))
+              / SUM(d.bytes)) * 100, 1)                used_pct
 FROM dba_tablespaces t
 JOIN dba_data_files d ON t.tablespace_name = d.tablespace_name
 LEFT JOIN (

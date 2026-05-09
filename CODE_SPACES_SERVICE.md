@@ -70,7 +70,7 @@ GitHub には以下のアカウント種別があります。
 
 ## 3. 停止方法
 
-1. `Code`タブに移動し、右上にある緑色の`code`のプルダウンメニューを開き、`Codespace`タブを開き、`Active`の右側にある三点リーダー（・・・）をクリックして`Delete`をクリックします。
+1. `Code`タブに移動し、右上にある緑色の`code`のプルダウンメニューを開き、`Codespace`タブを開き、`Active`の右側にある三点リーダー（…）をクリックして`Delete`をクリックします。
 
    ![stop-code-space](/assets/stop-code-space.png)
 

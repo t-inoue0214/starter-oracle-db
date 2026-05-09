@@ -1,6 +1,10 @@
 #!/bin/bash
 # バックグラウンドプロセスと SGA 情報を確認するスクリプト
 
+# Oracle 環境変数を読み込む
+# shellcheck source=/etc/profile.d/oracle-env.sh
+[ -f /etc/profile.d/oracle-env.sh ] && source /etc/profile.d/oracle-env.sh
+
 echo "=== Oracle バックグラウンドプロセス ==="
 ps aux | grep -E 'xe_' | grep -v grep
 

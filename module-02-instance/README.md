@@ -254,6 +254,13 @@ ALTER SYSTEM SET sessions=504 SCOPE=SPFILE;
 
 ### Step 7: リスナーの状態を確認する
 
+> **前提**: Module 1 の「Oracle SQL Developer の接続セットアップ」で `generate-wallet.sh` を実行済みであること。
+> 未実行の場合は先に以下を実行してください。
+>
+> ```bash
+> bash /workspaces/starter-oracle-db/sql-developer-wallet/generate-wallet.sh
+> ```
+
 ```bash
 lsnrctl status
 ```

@@ -14,6 +14,7 @@ Oracle Database は、単なる「データを保存する箱」ではありま�
 - Oracle Database 21c XE を `dnf` コマンドでインストールし、起動確認できる
 - DBCA の役割と使用場面を説明できる
 - SQL\*Plus でインスタンスに接続し、基本的な情報を取得できる
+- `NLS_LANG` の3要素（言語・地域・文字コード）を説明でき、適切な値を選択できる
 
 ---
 
@@ -245,6 +246,27 @@ Codespaces の VS Code ターミナルは**非ログインシェル**です。
 | `~/.bash_profile` | ログインシェル（oracle ユーザー） | SSH 接続、`su - oracle` |
 | `~/.bashrc` | **非ログインシェル（oracle ユーザー）** | **VS Code のターミナル**を新規に開いたとき |
 
+### setup-env.sh が設定する環境変数
+
+`setup-env.sh` は以下の6つの環境変数を上記3ファイルすべてに書き込みます。
+
+| 変数 | 設定値 | 役割 |
+| :--- | :--- | :--- |
+| `ORACLE_BASE` | `/opt/oracle` | Oracle ソフトウェア全体のベースディレクトリ |
+| `ORACLE_HOME` | `/opt/oracle/product/21c/dbhomeXE` | `sqlplus` や `lsnrctl` などのバイナリが格納されたディレクトリ |
+| `ORACLE_SID` | `XE` | 接続対象のインスタンス識別子。`sqlplus / as sysdba` がこれを参照して接続先を決定する |
+| `PATH` | `$ORACLE_HOME/bin:$PATH` | `sqlplus`・`lsnrctl` などを絶対パスなしで実行できるようにする |
+| `LD_LIBRARY_PATH` | `$ORACLE_HOME/lib` | Oracle の共有ライブラリ（`.so` ファイル）の検索パスを追加する |
+| `NLS_LANG` | `JAPANESE_JAPAN.AL32UTF8` | SQL\*Plus がデータを表示する際の文字コードを宣言する（詳細は後述） |
+
+**`ORACLE_SID`** はインスタンスを識別する文字列です。
+`sqlplus / as sysdba`（OS 認証）を実行すると Oracle がこの値を見て接続先のインスタンスを決定します。
+XE は Oracle Database Express Edition のデフォルト SID で、1台のサーバーに複数インスタンスを立てる場合にこの区別が特に重要になります。
+
+**`LD_LIBRARY_PATH`** は「共有ライブラリの検索パス」です。
+Oracle のバイナリ（`sqlplus` など）は起動時に `$ORACLE_HOME/lib/` 配下の `.so` ファイルを動的に読み込みます。
+この変数がないと `sqlplus: error while loading shared libraries` というエラーが発生します。
+
 `setup-env.sh` を実行すると、上記3ファイルの作成と現在のシェルへの反映を一括で行います。
 
 ```bash
@@ -285,6 +307,49 @@ source ~/.bashrc
 echo $ORACLE_HOME
 # /opt/oracle/product/21c/dbhomeXE と表示されれば成功
 ```
+
+### NLS_LANG — クライアント文字コードの宣言
+
+`setup-env.sh` が設定する `NLS_LANG` は `言語_地域.文字コード` の3要素で構成されています。
+
+```text
+JAPANESE_JAPAN.AL32UTF8
+    ↑         ↑     ↑
+  言語      地域   文字コード
+```
+
+| 要素 | 意味 | 値の例と効果 |
+| :--- | :--- | :--- |
+| **言語（LANGUAGE）** | SQL\*Plus のメッセージ言語 | `JAPANESE` → 「セッションが変更されました」 / `AMERICAN` → 「Session altered.」 |
+| **地域（TERRITORY）** | デフォルトの日付形式・通貨記号 | `JAPAN` → `YYYY/MM/DD` 形式 / `AMERICA` → `DD-MON-YY` 形式 |
+| **文字コード（CHARACTERSET）** | クライアント側の文字コード | ターミナルの文字コードに合わせる（後述） |
+
+文字コード部分の選択肢と使い分けは以下のとおりです。
+
+| 文字コード | 規格 | 使う場面 |
+| :--- | :--- | :--- |
+| `AL32UTF8` | Unicode UTF-8（4バイト対応） | Linux / Mac ターミナル（**現代の標準。推奨**） |
+| `JA16SJIS` | Shift-JIS | Windows のコマンドプロンプト（cmd.exe）など旧来の Windows 環境 |
+| `JA16EUC` | EUC-JP | 古い Unix / Linux サーバー |
+| `UTF8` | Oracle 独自の旧 UTF-8（3バイトまで） | **非推奨**。`AL32UTF8` を使うこと |
+
+> **文字コードが合わないと日本語が「????」になる**
+>
+> `NLS_LANG` が未設定または端末の文字コードと一致しないと、Oracle がクライアントは ASCII 環境だと解釈し、
+> UTF-8 の日本語バイト列を ASCII に変換しようとして「????」と表示します。
+>
+> データベース側の文字コード（`NLS_CHARACTERSET`）は `AL32UTF8` に固定されており、
+> Codespaces のターミナルも UTF-8 です。このため `JAPANESE_JAPAN.AL32UTF8` が正解です。
+
+データベース側の文字コードは以下の SQL で確認できます。
+
+```sql
+-- sqlplus / as sysdba で接続後に実行
+SELECT value FROM nls_database_parameters WHERE parameter = 'NLS_CHARACTERSET';
+-- → AL32UTF8
+```
+
+---
 
 ### Step 4: データベースの設定・初期化
 
@@ -470,6 +535,7 @@ VS Code のエクスプローラーで `sql-developer-wallet/dist/wallet.zip` �
 3. LGWR（Log Writer）はどのタイミングで動作しますか？また、なぜコミット時に必ず書き込みが行われるのでしょうか？
 4. `oracle-database-preinstall-21c` パッケージをインストールする目的は何ですか？これがないと何が起きると考えられますか？
 5. DBCA を使わずに手動でデータベースを作成できますか？DBCA を使う利点は何でしょうか？
+6. `NLS_LANG=JAPANESE_JAPAN.AL32UTF8` の3つの要素（`JAPANESE`・`JAPAN`・`AL32UTF8`）はそれぞれ何を意味しますか？Windows のコマンドプロンプト（Shift-JIS 環境）から接続する場合、どの値に変更すればよいですか？
 
 ---
 
