@@ -39,7 +39,7 @@ Oracle Database Silver（Bronze + Silver）の資格取得と DBA としての�
 | コマンド | エージェント名 | 役割 |
 |---|---|---|
 | `/plan` | 計画者 | カリキュラムの章構成・学習目標・実習内容を計画・更新する |
-| `/draft-chapter` | 新人教育担当者 | 各章の README.md を作成または更新し、品質を評価する。 |
+| `/draft-chapter` | 新人の教育担当者 | 各章の README.md を作成または更新し、品質を評価する。 |
 | `/verify-db` | Oracle DB マスター | SQL・DBA コマンドをコンテナ内で実行し、教材の正確性を検証する |
 
 ---

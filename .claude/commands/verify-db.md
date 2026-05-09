@@ -36,7 +36,7 @@ SQL> EXIT
 
 ### ログ出力形式
 
-```
+```text
 === verify-chapter-NN.log ===
 検証日時: YYYY-MM-DD HH:MM
 対象章: 第NN章 - タイトル
