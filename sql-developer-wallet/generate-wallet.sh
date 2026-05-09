@@ -8,7 +8,7 @@ set -e
 
 ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
 SERVER_WALLET=/opt/oracle/admin/XE/tcps_wallet
-CLIENT_WALLET_DIR=/workspaces/starter-oracle-db/sql-developer-wallet
+CLIENT_WALLET_DIR=/workspaces/starter-oracle-db/sql-developer-wallet/dist
 NET_ADMIN=/opt/oracle/homes/OraDBHome21cXE/network/admin
 
 echo "=== TCPS Wallet 生成スクリプト ==="
@@ -112,11 +112,23 @@ else
     echo "WARNING: ポート 2484 が確認できません。lsnrctl status で確認してください。"
 fi
 
+# Oracle サービスをリスナーに強制再登録
+# リスナー再起動後、動的登録（LREG）は数十秒かかる場合があるため ALTER SYSTEM REGISTER で即時登録する
+echo "Oracle サービスをリスナーに再登録中..."
+sqlplus -s / as sysdba <<'SQLEOF' 2>/dev/null || echo "WARNING: ALTER SYSTEM REGISTER に失敗しました。Oracle インスタンスが起動していない可能性があります。"
+ALTER SYSTEM REGISTER;
+EXIT;
+SQLEOF
+sleep 2
+
 # ────────────────────────────────────────────
 # 5. クライアント Wallet の生成
 # ────────────────────────────────────────────
 echo ""
 echo "--- [5/5] クライアント Wallet を生成中 ---"
+
+# Wallet パスワード（ewallet.p12 を開くときに SQL Developer で入力する）
+WALLET_PWD="WalletPass#1"
 
 # サーバー証明書をエクスポート
 $ORACLE_HOME/bin/orapki wallet export \
@@ -128,16 +140,19 @@ $ORACLE_HOME/bin/orapki wallet export \
 rm -rf "$CLIENT_WALLET_DIR"
 mkdir -p "$CLIENT_WALLET_DIR/wallet"
 
-# クライアント Wallet 作成（サーバー証明書を trusted cert として登録）
+# クライアント Wallet 作成
+# -auto_login: ewallet.p12（JDBC Thin 用）と cwallet.sso（自動ログイン用）の両方を生成
 $ORACLE_HOME/bin/orapki wallet create \
     -wallet "$CLIENT_WALLET_DIR/wallet" \
-    -auto_login_only
+    -pwd "$WALLET_PWD" \
+    -auto_login
 
+# サーバー証明書を trusted cert として登録
 $ORACLE_HOME/bin/orapki wallet add \
     -wallet "$CLIENT_WALLET_DIR/wallet" \
     -trusted_cert \
     -cert /tmp/server-tcps.crt \
-    -auto_login_only
+    -pwd "$WALLET_PWD"
 
 # tnsnames.ora（クライアント用）
 cat > "$CLIENT_WALLET_DIR/wallet/tnsnames.ora" << 'TNSNAMESEOF'
@@ -158,7 +173,7 @@ SSL_VERSION = 1.2
 NAMES.DIRECTORY_PATH = (TNSNAMES)
 SQLNETCLIENTEOF
 
-# wallet.zip にパッケージ
+# wallet.zip にパッケージ（ewallet.p12 を含む）
 cd "$CLIENT_WALLET_DIR"
 zip -j wallet.zip wallet/*
 rm -rf wallet
@@ -174,13 +189,14 @@ echo "=== セットアップ完了 ==="
 echo ""
 echo "【wallet.zip の取得方法】"
 echo "  VS Code のエクスプローラーで以下を右クリック → ダウンロード:"
-echo "  sql-developer-wallet/wallet.zip"
+echo "  sql-developer-wallet/dist/wallet.zip"
 echo ""
 echo "【SQL Developer での接続設定】"
 echo "  1. 「新規接続」→ 接続タイプ: Cloud Wallet"
 echo "  2. 「参照」で wallet.zip を指定"
 echo "  3. サービス: XE_SECURE"
 echo "  4. ユーザー名・パスワードを入力 → 接続"
+echo "  ※ Wallet パスワード（初回接続時に求められる場合): $WALLET_PWD"
 echo ""
 echo "  ※ Oracle Instant Client は不要です"
 echo "  ※ VS Code で Codespaces に接続した状態で使用してください（ポート 2484 が転送されます）"

@@ -2,4 +2,4 @@
 *.rpm
 
 # SQL Developer 接続用 wallet（自己署名証明書・接続情報を含むため）
-sql-developer-wallet/
+sql-developer-wallet/dist

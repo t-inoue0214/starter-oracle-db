@@ -420,6 +420,47 @@ bash /workspaces/starter-oracle-db/start-oracle.sh
 > **Oracle の学習対象ではありません**。Codespaces のポート転送が HTTP のみ対応しているのに対し、
 > Oracle EM Express が HTTPS を必須とするため、その差を吸収するための裏方ツールです。気にせず読み飛ばしてください。
 
+### Oracle SQL Developer の接続セットアップ
+
+Oracle SQL Developer はローカルにインストールした GUI ツールで、SQL*Plus の代わりに使えます。
+Codespaces 上の Oracle XE へ **Wallet ファイル**を使って接続できます（Oracle Instant Client は不要）。
+
+SQL Developer がポート 2484 に接続できるのは、**VS Code デスクトップアプリが SSH トンネルでポートを転送している**おかげです。
+ブラウザ版 Codespaces ではこの転送が機能しないため、必ずデスクトップアプリを使用してください。
+
+#### 前提: VS Code デスクトップアプリで Codespaces に接続する
+
+1. **VS Code デスクトップアプリをインストール** — [code.visualstudio.com](https://code.visualstudio.com/) からダウンロードしてインストールする
+2. **拡張機能「GitHub Codespaces」をインストール** — VS Code の拡張機能タブで `GitHub Codespaces` を検索してインストールする
+3. **GitHub アカウントでサインイン** — VS Code 左下の「アカウント」アイコン → 「GitHub でサインイン」→ ブラウザで認証する
+4. **Codespace に接続** — `Ctrl+Shift+P`（Mac: `Cmd+Shift+P`）→ `Codespaces: Connect to Codespace` → 対象の Codespace を選択する
+5. **接続確認** — VS Code 左下に `Codespaces: starter-oracle-db` と表示されれば接続成功
+
+#### Wallet ファイルの生成（1度だけ実行）
+
+VS Code デスクトップアプリで Codespaces に接続した状態で、ターミナルを開いて実行します。
+
+```bash
+bash /workspaces/starter-oracle-db/sql-developer-wallet/generate-wallet.sh
+```
+
+完了すると `sql-developer-wallet/dist/wallet.zip` が生成されます。
+
+#### wallet.zip のダウンロード
+
+VS Code のエクスプローラーで `sql-developer-wallet/dist/wallet.zip` を右クリック → 「ダウンロード」
+
+#### SQL Developer の接続設定
+
+1. 「新規接続」→ 接続タイプ: **Cloud Wallet**
+2. 「参照」で `wallet.zip` を指定する
+3. サービス: `XE_SECURE`
+4. ユーザー名（例: `SYSTEM`）とパスワードを入力 → 接続
+5. 「テスト」をクリックして「ステータス: 成功」を確認 → 「接続」
+
+> Wallet ファイルのパスワードは不要です（`cwallet.sso` による自動ログインが有効なため）。
+> Codespaces を再ビルドした場合は、`generate-wallet.sh` を再実行して新しい `wallet.zip` を取得してください。
+
 ---
 
 ## 確認してみよう
