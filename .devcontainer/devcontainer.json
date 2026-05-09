@@ -7,14 +7,14 @@
         "memory": "8gb",
         "cpus": 4
     },
-    "forwardPorts": [1521, 5500],
+    "forwardPorts": [1521, 5501],
     "portsAttributes": {
         "1521": {
             "label": "Oracle Listener (TNS)",
             "onAutoForward": "silent"
         },
-        "5500": {
-            "label": "EM Express",
+        "5501": {
+            "label": "EM Express (nginx proxy)",
             "onAutoForward": "notify"
         }
     },
