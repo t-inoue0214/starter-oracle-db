@@ -400,6 +400,28 @@ Buffer Cache Size                  480.0
 
 ---
 
+### Codespaces 再起動後の起動手順
+
+Codespaces を停止・再起動すると Oracle インスタンスが停止した状態になります。
+学習を再開する際は、以下のスクリプトを実行してください。
+
+```bash
+bash /workspaces/starter-oracle-db/start-oracle.sh
+```
+
+このスクリプトは次の3つをまとめて行います。
+
+1. Oracle XE が停止していれば起動する
+2. インスタンスが OPEN 状態であることを確認する
+3. EM Express（Web ブラウザから操作できる管理 GUI）を Codespaces のポート転送経由で使えるようにする
+
+> **nginx について**: スクリプト実行時に「EM Express ブラウザアクセス用プロキシ」という表示が出ます。
+> これは EM Express を Codespaces のブラウザから開くためのリバースプロキシ（nginx）です。
+> **Oracle の学習対象ではありません**。Codespaces のポート転送が HTTP のみ対応しているのに対し、
+> Oracle EM Express が HTTPS を必須とするため、その差を吸収するための裏方ツールです。気にせず読み飛ばしてください。
+
+---
+
 ## 確認してみよう
 
 1. Oracle の「インスタンス」と「データベース」は何が違いますか？それぞれ OS 上でどのように存在していますか？

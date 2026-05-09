@@ -7,7 +7,8 @@ RUN dnf install -y oracle-release-el8 && \
         vim tar unzip wget sudo net-tools \
         bc libnsl libaio \
         sysstat procps-ng \
-        less lsof hostname git\
+        less lsof hostname git \
+        nginx \
     && dnf clean all
 
 # Module 1 の「dnf install oracle-database-xe-21c」実習のため sudo 権限を付与

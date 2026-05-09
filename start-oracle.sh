@@ -48,3 +48,47 @@ else
     echo "  sudo /etc/init.d/oracle-xe-21c status"
     exit 1
 fi
+
+echo ""
+echo "=== EM Express (tcps) 確認 ==="
+HTTPS_PORT=$($ORACLE_HOME/bin/sqlplus -S / as sysdba <<'EOF'
+SET HEADING OFF FEEDBACK OFF PAGESIZE 0
+SELECT dbms_xdb_config.gethttpsport() FROM dual;
+EXIT;
+EOF
+)
+HTTPS_PORT=$(echo "$HTTPS_PORT" | tr -d '[:space:]')
+
+if [ "$HTTPS_PORT" != "5500" ]; then
+    echo "tcps ポートを 5500 に設定中..."
+    $ORACLE_HOME/bin/sqlplus -S / as sysdba <<'EOF'
+EXEC DBMS_XDB_CONFIG.SETHTTPPORT(0);
+EXEC DBMS_XDB_CONFIG.SETHTTPSPORT(5500);
+EXIT;
+EOF
+fi
+echo "EM Express: tcps (HTTPS) ポート 5500 で動作中。"
+
+echo ""
+echo "=== EM Express ブラウザアクセス用プロキシ確認 ==="
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if ss -tlnp | grep -q "0.0.0.0:5501"; then
+    echo "nginx はすでに起動しています（ポート 5501）。"
+else
+    CONF="$SCRIPT_DIR/nginx-em.conf"
+    if [ ! -f "$CONF" ]; then
+        echo "ERROR: $CONF が見つかりません。" >&2
+        exit 1
+    fi
+    sudo nginx -c "$CONF" -g "pid /tmp/nginx-em.pid;"
+    sleep 1
+    if ss -tlnp | grep -q "0.0.0.0:5501"; then
+        echo "nginx を起動しました（ポート 5501）。"
+    else
+        echo "ERROR: nginx の起動に失敗しました。" >&2
+        exit 1
+    fi
+fi
+echo "EM Express アクセス URL: Codespaces のポート 5501 転送 URL + /em"
+echo "  ユーザー名: SYSTEM（または SYS、ロール: SYSDBA）"
+echo "  パスワード: インストール時に設定したパスワード（例: Oracle_21c）"
