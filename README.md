@@ -1,4 +1,5 @@
 # starter-oracle-db
+
 Oracle DB が学習できる環境を提供するため作成しました。
 
 環境構築不要！ブラウザだけで学べる Oracle Database Silver DBA 習得講座へようこそ。
@@ -8,15 +9,6 @@ Oracle DB が学習できる環境を提供するため作成しました。
 > **⚠️ 学習上の重要ルール**
 > [Oracle Database 21c ドキュメント](https://docs.oracle.com/en/database/oracle/oracle-database/21/index.html) の情報が「最新かつ正確」な一次情報です。
 > ここで記載した内容や、もし AI から回答を得た場合であっても、**必ず公式ドキュメントを確認しながら学習する癖** をつけてください。
-
----
-
-> ========================
-> 
-> このコンテナの起動には、非常に時間がかかります。  
-> 画面右下に「setting up remote connection building codespace」と表示されるので、クリックすると起動ログをターミナルに表示することができます。
->
-> ========================
 
 ---
 
@@ -96,6 +88,20 @@ Oracle DB が学習できる環境を提供するため作成しました。
 | **Module 5** | 第9章 | データの搬入・搬出 | Data Pump、SQL\*Loader、外部表 |
 | **Module 6** | 第10〜18章 | 開発者の一歩先を行くSQL | 標準SQL、関数、結合、副問合せ、DML |
 | **Module 7** | 第19〜23章 | オブジェクトの最適化と整合性 | DDL、索引、ビュー、シーケンス、制約 |
+
+この7つのモジュールは **「DB の土台 → 管理 → SQL 活用」** という流れで設計されています。
+Java 開発者が本番障害に直面したとき、その原因の多くは DB 設計・権限設定・インデックス不足にあります。
+DBA の視点を持つことで、アプリケーション開発全体の品質が向上します。
+
+```mermaid
+flowchart LR
+    M1["Module 1\nアーキテクチャ\nインストール"] --> M2["Module 2\nインスタンス管理\nOracle Net"]
+    M2 --> M3["Module 3\nユーザー管理\n権限・UNDO"]
+    M3 --> M4["Module 4\nストレージ管理\n表領域"]
+    M4 --> M5["Module 5\nData Pump\nSQL*Loader"]
+    M5 --> M6["Module 6\nSQL・関数\n結合・副問合せ"]
+    M6 --> M7["Module 7\nDDL・索引\nビュー・制約"]
+```
 
 ---
 

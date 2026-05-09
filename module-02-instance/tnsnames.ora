@@ -1,0 +1,26 @@
+# module-02-instance/tnsnames.ora
+# Oracle Net 接続文字列のサンプル（第4章実習用）
+#
+# 使用方法:
+#   export TNS_ADMIN=/workspaces/starter-oracle-db/module-02-instance
+#   sqlplus system@XE_LOCAL
+
+# CDB（コンテナ・データベース）への接続
+XE_LOCAL =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = XE)
+    )
+  )
+
+# PDB（プラガブル・データベース）への接続
+XEPDB1_LOCAL =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = XEPDB1)
+    )
+  )
