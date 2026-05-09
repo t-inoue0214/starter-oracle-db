@@ -23,7 +23,7 @@ Oracle Database は、単なる「データを保存する箱」ではありま�
 
 Oracle を理解する上で最も重要な概念が「インスタンス」と「データベース」の区別です。
 
-```
+```text
 ┌─────────────────────────────────────────────┐
 │              Oracle インスタンス              │
 │                                             │
@@ -53,7 +53,7 @@ Oracle を理解する上で最も重要な概念が「インスタンス」と�
 | **データベース** | ディスク上のファイル群（データファイル・制御ファイル・REDOログ）。電源を切っても残る実体 |
 
 インスタンスは起動すると SGA をメモリに確保し、バックグラウンドプロセスを起動します。
-インスタンスを起動しなければ、データベース（ファイル）にアクセスすることはできません。
+インスタンスを起動しなければ、データベース（ファイル）にアクセスできません。
 
 ---
 
@@ -111,7 +111,8 @@ Oracle が起動すると自動で起動するプロセス群です。
 Oracle Database のインストールには、OS レベルの事前設定が多数必要です。
 `oracle-database-preinstall-21c` パッケージはこれらを自動化します。
 
-自動設定される主な内容:
+自動設定される主な内容は以下のとおりです。
+
 - カーネルパラメータ（`shmmax`, `semaphore` など）の最適化
 - `oracle` ユーザーと `oinstall` / `dba` グループの作成
 - `/etc/security/limits.conf` のリソース制限設定
@@ -120,7 +121,7 @@ Oracle Database のインストールには、OS レベルの事前設定が多�
 
 ### oracle-database-xe-21c のインストール構成
 
-インストール後の主要なパス:
+インストール後の主要なパスは以下のとおりです。
 
 | パス | 内容 |
 | :--- | :--- |
@@ -187,8 +188,9 @@ RPM ファイルを GitHub などの公開リポジトリに置くことはラ�
 ls /workspaces/starter-oracle-db/oracle-database-xe-21c-*.rpm
 ```
 
-期待される出力:
-```
+実行すると以下のように出力されます。
+
+```text
 /workspaces/starter-oracle-db/oracle-database-xe-21c-1.0-1.ol8.x86_64.rpm
 ```
 
@@ -213,26 +215,53 @@ ls /opt/oracle/product/21c/dbhomeXE/bin/sqlplus
 
 Oracle のバイナリ（`sqlplus`, `lsnrctl` など）を PATH に通すため、環境変数ファイルを作成します。
 
-**なぜ2か所に設定するのか**
+### なぜ3か所に設定するのか
 
-| ファイル | 対象 | 目的 |
+Linux では、シェル（ターミナル）の起動方法によって「どの設定ファイルを読み込むか」が変わります。
+これを理解せずにいると「あるターミナルでは `sqlplus` が使えるのに、新しく開いたターミナルでは使えない」という状況が起きます。
+
+シェルの種類は大きく2つに分かれます。
+
+**ログインシェル** — サーバーに「ログイン」するときに起動するシェルです。
+
+- SSH でサーバーに接続したとき
+- `su - oracle` のように `-` オプション付きでユーザーを切り替えたとき
+- 読み込まれる設定ファイル: `/etc/profile.d/*.sh`、`~/.bash_profile`
+
+**非ログインシェル** — すでにログイン済みの環境から新しく開くシェルです。
+
+- VS Code のターミナルで `+` ボタンを押して新しいタブを開いたとき
+- スクリプト内で `bash` を実行したとき
+- 読み込まれる設定ファイル: `~/.bashrc`（`~/.bash_profile` は読み込まれない）
+
+Codespaces の VS Code ターミナルは**非ログインシェル**です。
+`~/.bashrc` に設定がなければ、新しいターミナルを開くたびに `sqlplus` が見つからなくなります。
+
+これらをまとめると、Oracle のバイナリをどの起動方法でも確実に使えるよう3か所に設定します。
+
+| ファイル | 読み込まれるシェル | 主な起動場面 |
 | :--- | :--- | :--- |
-| `/etc/profile.d/oracle-env.sh` | システム全体のすべてのユーザー | 新しいシェルを開いたとき自動で読み込まれる |
-| `~/.bash_profile` | oracle ユーザーのみ | ログインシェル起動時に読み込まれる |
+| `/etc/profile.d/oracle-env.sh` | ログインシェル（システム全体） | SSH 接続、`su -` |
+| `~/.bash_profile` | ログインシェル（oracle ユーザー） | SSH 接続、`su - oracle` |
+| `~/.bashrc` | **非ログインシェル（oracle ユーザー）** | **VS Code のターミナル**を新規に開いたとき |
 
-`setup-env.sh` を実行すると、上記2ファイルの作成と現在のシェルへの反映を一括で行います:
+`setup-env.sh` を実行すると、上記3ファイルの作成と現在のシェルへの反映を一括で行います。
 
 ```bash
 bash /workspaces/starter-oracle-db/module-01-architecture/setup-env.sh
 ```
 
-期待される出力:
-```
+実行すると以下のように出力されます。
+
+```text
 === /etc/profile.d/oracle-env.sh を作成（システム全体向け） ===
 作成完了: /etc/profile.d/oracle-env.sh
 
 === ~/.bash_profile に追記（oracle ユーザーのログインシェル向け） ===
 追記完了: ~/.bash_profile
+
+=== ~/.bashrc に追記（VS Code ターミナルなど非ログインシェル向け） ===
+追記完了: ~/.bashrc
 
 === 現在のシェルに環境変数を反映 ===
 ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
@@ -247,10 +276,11 @@ ORACLE_SID=XE
 > 以下のコマンドで現在のシェルに手動で読み込みます。
 
 ```bash
-source ~/.bash_profile
+source ~/.bashrc
 ```
 
-確認:
+以下を実行して確認します。
+
 ```bash
 echo $ORACLE_HOME
 # /opt/oracle/product/21c/dbhomeXE と表示されれば成功
@@ -269,8 +299,9 @@ sudo ORACLE_HOSTNAME=$HOSTNAME /etc/init.d/oracle-xe-21c configure
 > なお、このパスワードはSYS、SYSTEM、およびPDBADMINアカウントで共通して使用されます。  
 > このパスワードは以降の SQL\*Plus 接続に使用するので忘れずに記録しておいてください。
 
-設定には数分かかります。完了後に以下が表示されれば成功です:
-```
+設定には数分かかります。完了後に以下が表示されれば成功です。
+
+```text
 Database creation complete.
 ```
 
@@ -281,8 +312,9 @@ Database creation complete.
 lsnrctl status
 ```
 
-期待される出力（抜粋）:
-```
+期待される出力（抜粋）
+
+```text
 STATUS of the LISTENER
 ------------------------
 Alias                     LISTENER
@@ -298,7 +330,7 @@ Uptime                    ...
 sqlplus / as sysdba
 ```
 
-接続できたら、インスタンスの状態を確認します:
+接続できたら、インスタンスの状態を確認します。
 
 ```sql
 -- インスタンスの状態を確認
@@ -310,21 +342,22 @@ SELECT status FROM v$instance;
 -- OPEN
 ```
 
-SQL\*Plus を終了します:
+SQL\*Plus を終了します。
+
 ```sql
 EXIT
 ```
 
 ### Step 7: バックグラウンドプロセスの確認
 
-別のスクリプトを使って、OS 上で動作している Oracle プロセスを確認します:
+別のスクリプトを使って、OS 上で動作している Oracle プロセスを確認します。
 
 ```bash
 # check-processes.sh を実行
 bash /workspaces/starter-oracle-db/module-01-architecture/check-processes.sh
 ```
 
-または直接 `ps` コマンドで確認:
+または直接 `ps` コマンドで確認します。
 
 ```bash
 ps aux | grep -E 'xe_' | grep -v grep
@@ -332,8 +365,9 @@ ps aux | grep -E 'xe_' | grep -v grep
 
 > **補足**: Oracle Database XE では、バックグラウンドプロセスのプレフィックスは `ora_` ではなく `xe_` になります。
 
-期待される出力例（一部）:
-```
+期待される出力例（一部）
+
+```text
 oracle   ...  xe_pmon_XE
 oracle   ...  xe_dbw0_XE
 oracle   ...  xe_lgwr_XE
@@ -352,8 +386,9 @@ EXIT
 EOF
 ```
 
-期待される出力例:
-```
+実行すると以下のように出力されます。
+
+```text
 NAME                                  MB
 -------------------------------- -------
 Maximum SGA Size                  1520.0
@@ -371,7 +406,7 @@ Buffer Cache Size                  480.0
 2. SGA に含まれる主要なメモリ領域を3つ挙げ、それぞれがどのような役割を担っているか説明してください。
 3. LGWR（Log Writer）はどのタイミングで動作しますか？また、なぜコミット時に必ず書き込みが行われるのでしょうか？
 4. `oracle-database-preinstall-21c` パッケージをインストールする目的は何ですか？これがないと何が起きると考えられますか？
-5. DBCA を使わずに手動でデータベースを作成することは可能ですか？DBCA を使う利点は何でしょうか？
+5. DBCA を使わずに手動でデータベースを作成できますか？DBCA を使う利点は何でしょうか？
 
 ---
 

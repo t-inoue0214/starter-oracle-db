@@ -27,6 +27,7 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                "vscjava.vscode-java-pack",
                 "oracle.sql-developer",
                 "ms-azuretools.vscode-docker",
                 "vscjava.vscode-java-pack",

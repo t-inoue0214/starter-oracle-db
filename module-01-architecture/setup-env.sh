@@ -28,6 +28,19 @@ EOF
 echo "追記完了: ~/.bash_profile"
 
 echo ""
+echo "=== ~/.bashrc に追記（VS Code ターミナルなど非ログインシェル向け） ==="
+cat >> ~/.bashrc << 'EOF'
+
+# Oracle Database 環境変数
+export ORACLE_BASE=/opt/oracle
+export ORACLE_HOME=/opt/oracle/product/21c/dbhomeXE
+export ORACLE_SID=XE
+export PATH=$ORACLE_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+EOF
+echo "追記完了: ~/.bashrc"
+
+echo ""
 echo "=== 現在のシェルに環境変数を反映 ==="
 source /etc/profile.d/oracle-env.sh
 echo "ORACLE_HOME=$ORACLE_HOME"
